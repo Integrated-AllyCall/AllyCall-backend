@@ -2,9 +2,7 @@
 
 This is the backend API for **AllyCall**, a safety-first mobile app that helps individuals commuting alone report incidents, trigger fake calls, and access legal information — supporting gender equality and user empowerment.
 
----
-
-## Project Details
+## Project Details 📄
 - **University**: CS@SIT, KMUTT
 - **Course**: Integrated Project 2 & Capstone Project
 - **Team Members**:
@@ -13,10 +11,12 @@ This is the backend API for **AllyCall**, a safety-first mobile app that helps i
   - Nannicha Phraemetta (66130500846)
 
 ---
-## Setup environment
+## Setup environment 🌱
+```
 ./setup.sh
+```
 
-## Create a .env file
+## Create a .env file 
 ```
 DATABASE_URL=postgresql://user:password@localhost:5432/allycall_db
 MINIO_ENDPOINT=http://localhost:9000
