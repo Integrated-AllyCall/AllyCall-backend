@@ -1,4 +1,4 @@
-# AllyCall Backend (FastAPI)
+# AllyCall Backend
 
 This is the backend API for **AllyCall**, a safety-first mobile app that helps individuals commuting alone report incidents, trigger fake calls, and access legal information — supporting gender equality and user empowerment.
 
@@ -13,24 +13,19 @@ This is the backend API for **AllyCall**, a safety-first mobile app that helps i
 ---
 ## Setup environment 🌱
 ```
-./setup.sh
+npm i
 ```
 
 ## Create a .env file 
 ```
-DATABASE_URL=postgresql://user:password@localhost:5432/allycall_db
+DATABASE_URL='postgresql://user:password@localhost:5432/postgres?schema=allycall'
 MINIO_ENDPOINT=http://localhost:9000
-MINIO_ACCESS_KEY=allycallminio
+MINIO_ACCESS_KEY=user
 MINIO_SECRET_KEY=yourpassword
 
 ```
 
 ## Run the server
 ```
-./run.sh
-```
-
-## Clean python files
-```
-./clean.sh
+npm run dev
 ```

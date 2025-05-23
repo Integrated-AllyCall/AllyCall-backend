@@ -1,0 +1,24 @@
+{
+  "name": "allycall-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "This is the backend API for **AllyCall**, a safety-first mobile app that helps individuals commuting alone report incidents, trigger fake calls, and access legal information — supporting gender equality and user empowerment.",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon ./src/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^6.8.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "minio": "^8.0.5",
+    "multer": "^2.0.0",
+    "nodemon": "^3.1.10",
+    "pg": "^8.16.0",
+    "prisma": "^6.8.2"
+  }
+}

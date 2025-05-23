@@ -1,5 +1,0 @@
-fastapi[standard]
-uvicorn[standard]
-firebase-admin
-requests
-python-dotenv

@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model countries {
+  code        String        @id @db.Char(2)
+  name        String        @db.VarChar(40)
+  created_at  DateTime?     @default(now()) @db.Timestamp(6)
+  updated_at  DateTime?     @default(now()) @db.Timestamp(6)
+  legal_guide legal_guide[]
+}
+
+model legal_guide {
+  id           Int        @id @default(autoincrement())
+  title        String
+  description  String?
+  country_code String?    @db.Char(2)
+  created_at   DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at   DateTime?  @default(now()) @db.Timestamp(6)
+  countries    countries? @relation(fields: [country_code], references: [code], onDelete: Cascade)
+}
+
+model reports {
+  id          Int        @id @default(autoincrement())
+  tag         report_tag
+  description String?
+  latitude    Float
+  longitude   Float
+  user_id     String?
+  created_at  DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at  DateTime?  @default(now()) @db.Timestamp(6)
+  users       users?     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model upload_videos {
+  id          Int       @id @default(autoincrement())
+  tag         video_tag
+  title       String?   @db.VarChar(255)
+  description String?
+  video_url   String?
+  user_id     String?
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
+  users       users?    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model users {
+  id            String          @id
+  username      String?         @db.VarChar(50)
+  email         String?         @db.VarChar(50)
+  image_url     String?
+  created_at    DateTime?       @default(now()) @db.Timestamp(6)
+  updated_at    DateTime?       @default(now()) @db.Timestamp(6)
+  reports       reports[]
+  upload_videos upload_videos[]
+}
+
+enum report_tag {
+  Harassment
+  Stalking
+  Catcalling
+  Unsafe_Area         @map("Unsafe Area")
+  Assault
+  Suspicious_Activity @map("Suspicious Activity")
+}
+
+enum video_tag {
+  Dad
+  Mom
+  Brother
+  Sister
+  Friend
+  Boyfriend
+  Girlfriend
+  Boss
+  Colleague
+  Neighbor
+  Police
+  Security
+  Unknown_Caller @map("Unknown Caller")
+}
