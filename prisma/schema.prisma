@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -9,21 +8,11 @@ datasource db {
 }
 
 model countries {
-  code        String        @id @db.Char(2)
-  name        String        @db.VarChar(40)
-  created_at  DateTime?     @default(now()) @db.Timestamp(6)
-  updated_at  DateTime?     @default(now()) @db.Timestamp(6)
-  legal_guide legal_guide[]
-}
-
-model legal_guide {
-  id           Int        @id @default(autoincrement())
-  title        String
-  description  String?
-  country_code String?    @db.Char(2)
-  created_at   DateTime?  @default(now()) @db.Timestamp(6)
-  updated_at   DateTime?  @default(now()) @db.Timestamp(6)
-  countries    countries? @relation(fields: [country_code], references: [code], onDelete: Cascade)
+  code           String           @id @db.Char(2)
+  name           String           @db.VarChar(40)
+  created_at     DateTime?        @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?        @default(now()) @db.Timestamp(6)
+  country_legals country_legals[]
 }
 
 model reports {
@@ -32,22 +21,22 @@ model reports {
   description String?
   latitude    Float
   longitude   Float
-  user_id     String?
+  user_id     String
   created_at  DateTime?  @default(now()) @db.Timestamp(6)
   updated_at  DateTime?  @default(now()) @db.Timestamp(6)
-  users       users?     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  users       users      @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model upload_videos {
   id          Int       @id @default(autoincrement())
   tag         video_tag
-  title       String?   @db.VarChar(255)
+  title       String    @db.VarChar(255)
   description String?
-  video_url   String?
-  user_id     String?
+  video_url   String
+  user_id     String
   created_at  DateTime? @default(now()) @db.Timestamp(6)
   updated_at  DateTime? @default(now()) @db.Timestamp(6)
-  users       users?    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  users       users     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model users {
@@ -59,6 +48,16 @@ model users {
   updated_at    DateTime?       @default(now()) @db.Timestamp(6)
   reports       reports[]
   upload_videos upload_videos[]
+}
+
+model country_legals {
+  id           Int       @id @default(autoincrement())
+  title        String
+  description  String?
+  country_code String    @db.Char(2)
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  updated_at   DateTime? @default(now()) @db.Timestamp(6)
+  countries    countries @relation(fields: [country_code], references: [code], onDelete: Cascade)
 }
 
 enum report_tag {

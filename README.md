@@ -19,7 +19,8 @@ npm i
 ## Create a .env file 
 ```
 DATABASE_URL='postgresql://user:password@localhost:5432/postgres?schema=allycall'
-MINIO_ENDPOINT=http://localhost:9000
+MINIO_ENDPOINT=localhost
+MINIO_PORT=9000
 MINIO_ACCESS_KEY=user
 MINIO_SECRET_KEY=yourpassword
 GOOGLE_MAPS_API_KEY=

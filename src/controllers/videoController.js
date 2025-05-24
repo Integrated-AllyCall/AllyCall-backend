@@ -1,12 +1,16 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import { video_tag } from "@prisma/client";
+import prisma from "../configs/prisma.js";
 import fs from "fs";
-import { minioClient, BUCKET } from "../config/minio.js";
-
-const prisma = new PrismaClient();
+import { minioClient, BUCKET } from "../configs/minio.js";
 
 export const getVideoTags = (req, res) => {
-  const tags = Object.values(Prisma.video_tag);
-  res.json(tags);
+  try {
+    const tags = Object.values(video_tag);
+    res.json(tags);
+  } catch (error) {
+    console.error("Failed to fetch video tags:", error);
+    res.status(500).json({ error: "Something went wrong" });
+  }
 };
 
 export const uploadVideo = async (req, res) => {
@@ -38,14 +42,15 @@ export const uploadVideo = async (req, res) => {
 
     res.status(201).json(video);
   } catch (error) {
-    console.error("Failed to upload video:", err);
+    console.error("Failed to upload video:", error);
     fs.unlinkSync(file.path);
     res.status(500).json({ error: "Upload failed" });
   }
 };
 
 export const updateVideoDetails = async (req, res) => {
-  const { id, tag, title, description } = req.body;
+  const id = parseInt(req.params.id);
+  const { tag, title, description } = req.body;
   try {
     const video = await prisma.upload_videos.update({
       where: {
@@ -57,7 +62,7 @@ export const updateVideoDetails = async (req, res) => {
         description,
       },
     });
-    req.status(201).json(video);
+    res.status(201).json(video);
   } catch (error) {
     console.error("Failed to update details:", error);
     res.status(500).json({ error: "Something went wrong" });
@@ -65,7 +70,7 @@ export const updateVideoDetails = async (req, res) => {
 };
 
 export const getVideo = async (req, res) => {
-  const { tag, search } = req.body;
+  const { tag, search } = req.query;
   try {
     const where = {};
 
@@ -85,7 +90,7 @@ export const getVideo = async (req, res) => {
       orderBy: { created_at: "desc" },
     });
 
-    req.status(201).json(videos);
+    res.json(videos);
   } catch (error) {
     console.error("Failed to fetch video:", error);
     res.status(500).json({ error: "Something went wrong" });
