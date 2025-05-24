@@ -14,6 +14,7 @@ This is the backend API for **AllyCall**, a safety-first mobile app that helps i
 ## Setup environment 🌱
 ```
 npm i
+npx prisma generate
 ```
 
 ## Create a .env file 

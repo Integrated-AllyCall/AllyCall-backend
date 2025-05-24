@@ -1,6 +1,7 @@
 import express from "express";
 import * as videoController from "../controllers/videoController.js";
 import multer from "multer";
+// import { verifyFirebaseToken } from "../middlewares/auth.js";
 
 const upload = multer({ dest: "uploads/" });
 const videoRoute = express.Router();
@@ -9,6 +10,8 @@ videoRoute.get("/tags", videoController.getVideoTags);
 videoRoute.get("/", videoController.getVideo);
 videoRoute.post("/", upload.single("video"), videoController.uploadVideo);
 videoRoute.put("/:id", videoController.updateVideoDetails);
+// videoRoute.post("/", verifyFirebaseToken, upload.single("video"), videoController.uploadVideo);
+// videoRoute.put("/:id", verifyFirebaseToken, videoController.updateVideoDetails);
 
 export default videoRoute;
 

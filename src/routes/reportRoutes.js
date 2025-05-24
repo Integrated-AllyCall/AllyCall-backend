@@ -1,5 +1,6 @@
 import express from "express";
 import * as reportController from "../controllers/reportController.js";
+// import { verifyFirebaseToken } from "../middlewares/auth.js";
 
 const reportRoute = express.Router();
 
@@ -8,6 +9,8 @@ reportRoute.get("/", reportController.getReport);
 reportRoute.get("/nearby", reportController.getNearbyReports);
 reportRoute.post("/", reportController.createReport);
 reportRoute.put("/:id", reportController.updateReport);
+// reportRoute.post("/", verifyFirebaseToken, reportController.createReport);
+// reportRoute.put("/:id", verifyFirebaseToken, reportController.updateReport);
 
 export default reportRoute;
 

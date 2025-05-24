@@ -18,6 +18,7 @@ model countries {
 model reports {
   id          Int        @id @default(autoincrement())
   tag         report_tag
+  title       String     @db.VarChar(255)
   description String?
   latitude    Float
   longitude   Float
