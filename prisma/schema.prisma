@@ -9,7 +9,7 @@ datasource db {
 
 model countries {
   code           String           @id @db.Char(2)
-  name           String           @db.VarChar(40)
+  name           String           @db.VarChar(255)
   created_at     DateTime?        @default(now()) @db.Timestamp(6)
   updated_at     DateTime?        @default(now()) @db.Timestamp(6)
   country_legals country_legals[]
