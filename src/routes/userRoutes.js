@@ -4,7 +4,7 @@ import * as userController from "../controllers/userController.js";
 const userRoute = express.Router();
 
 userRoute.get("/", userController.getUser);
-userRoute.get("/:id", userController.getUser);
+userRoute.get("/:id", userController.getUserById);
 userRoute.post("/", userController.createUser);
 
 export default userRoute;

@@ -33,6 +33,7 @@ export const createUser = async (req, res) => {
         id,
         username,
         email,
+        image_url
       },
     });
     res.status(201).json(user);
