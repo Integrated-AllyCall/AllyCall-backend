@@ -60,6 +60,10 @@ export default reportRoute;
  *                     type: number
  *                   longitude:
  *                     type: number
+ *                   shortAddress:
+ *                     type: string
+ *                   longAddress:
+ *                     type: string
  *                   user_id:
  *                     type: string
  *       500:
@@ -109,6 +113,10 @@ export default reportRoute;
  *                     type: number
  *                   longitude:
  *                     type: number
+ *                   shortAddress:
+ *                     type: string
+ *                   longAddress:
+ *                     type: string
  *                   user_id:
  *                     type: string
  *                   distance:
@@ -144,6 +152,10 @@ export default reportRoute;
  *                 type: number
  *               longitude:
  *                 type: number
+ *               shortAddress:
+ *                 type: string
+ *               longAddress:
+ *                 type: string
  *               user_id:
  *                 type: string
  *     responses:
@@ -184,6 +196,10 @@ export default reportRoute;
  *                 type: number
  *               longitude:
  *                 type: number
+ *               shortAddress:
+ *                 type: string
+ *               longAddress:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Report updated successfully

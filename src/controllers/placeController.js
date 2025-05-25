@@ -20,6 +20,7 @@ export const getPlaceDetails = async (req, res) => {
     const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${process.env.GOOGLE_MAPS_API_KEY}`;
     const response = await fetch(url);
     const data = await response.json();
+    console.log(data);
     return res.json(data);
   } catch (error) {
     console.error("Failed to fetch place details:", error);

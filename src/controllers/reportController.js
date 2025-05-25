@@ -1,5 +1,7 @@
 import prisma from "../configs/prisma.js";
 import { report_tag } from "@prisma/client";
+import dotenv from "dotenv";
+dotenv.config();
 
 export const getReportTags = (req, res) => {
   try {
@@ -25,14 +27,49 @@ export const getReport = async (req, res) => {
 
 export const createReport = async (req, res) => {
   const { tag, title, description, latitude, longitude, user_id } = req.body;
+  let { shortAddress, longAddress, name } = req.body;
   try {
+    if (!longAddress && !shortAddress && !name) {
+      const geoRes = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${process.env.GOOGLE_MAPS_API_KEY}`
+      );
+      const geoData = await geoRes.json();
+
+      if (geoData.status === "OK" && geoData.results.length > 0) {
+        const result = geoData.results[0];
+        const components = result.address_components;
+
+        const get = (type) =>
+          components.find((c) => c.types.includes(type))?.long_name;
+
+        longAddress = result.formatted_address;
+        const district = get("sublocality") || get("sublocality_level_1");
+        const city =
+          get("locality") ||
+          get("administrative_area_level_2") ||
+          get("administrative_area_level_1");
+        const country = get("country");
+
+        shortAddress = [district, city, country].filter(Boolean).join(", ");
+
+        const streetNumber = get("street_number");
+        const route = get("route");
+        name =
+          get("premise") ||
+          (streetNumber && route ? `${streetNumber} ${route}` : null);
+      }
+    }
+
     const report = await prisma.reports.create({
       data: {
         tag,
         title,
         description,
+        name,
         latitude,
         longitude,
+        short_address: shortAddress,
+        long_address: longAddress,
         user_id,
       },
     });
@@ -41,7 +78,7 @@ export const createReport = async (req, res) => {
     console.error("Failed to create report:", error);
     res.status(500).json({ error: "Internal server error" });
   }
-}
+};
 
 export const updateReport = async (req, res) => {
   const id = parseInt(req.params.id);
@@ -49,14 +86,14 @@ export const updateReport = async (req, res) => {
   try {
     const report = await prisma.reports.update({
       where: {
-        id
+        id,
       },
       data: {
         tag,
         title,
         description,
         latitude,
-        longitude
+        longitude,
       },
     });
     res.status(201).json(report);
@@ -64,7 +101,7 @@ export const updateReport = async (req, res) => {
     console.error("Failed to create report:", error);
     res.status(500).json({ error: "Internal server error" });
   }
-}
+};
 
 export const getNearbyReports = async (req, res) => {
   const { lat, lng } = req.query;
@@ -73,7 +110,9 @@ export const getNearbyReports = async (req, res) => {
   const longitude = parseFloat(lng);
 
   if (isNaN(latitude) || isNaN(longitude)) {
-    return res.status(400).json({ error: "Latitude and longitude are required and must be numbers." });
+    return res.status(400).json({
+      error: "Latitude and longitude are required and must be numbers.",
+    });
   }
 
   const radiusKm = 10;
