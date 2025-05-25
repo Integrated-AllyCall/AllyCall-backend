@@ -52,6 +52,8 @@ export default reportRoute;
  *                     type: integer
  *                   tag:
  *                     type: string
+ *                   title:
+ *                     type: string
  *                   description:
  *                     type: string
  *                   latitude:
@@ -99,6 +101,8 @@ export default reportRoute;
  *                     type: integer
  *                   tag:
  *                     type: string
+ *                   title:
+ *                     type: string
  *                   description:
  *                     type: string
  *                   latitude:
@@ -132,6 +136,8 @@ export default reportRoute;
  *             properties:
  *               tag:
  *                 type: string
+ *               title:
+ *                     type: string
  *               description:
  *                 type: string
  *               latitude:
@@ -169,6 +175,8 @@ export default reportRoute;
  *             required: [id]
  *             properties:
  *               tag:
+ *                 type: string
+ *               title:
  *                 type: string
  *               description:
  *                 type: string

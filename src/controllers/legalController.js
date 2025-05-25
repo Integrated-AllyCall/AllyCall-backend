@@ -19,7 +19,7 @@ export const getLegal = async (req, res) => {
     res.json(legals);
   } catch (error) {
     console.error("Failed to fetch legals:", error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -48,6 +48,6 @@ export const getLegalByCoordinates = async (req, res) => {
     res.json({code: country.short_name, name: country.long_name,legal: legals});
   } catch (error) {
     console.error("Failed to fetch legals:", error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };

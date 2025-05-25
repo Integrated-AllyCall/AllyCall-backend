@@ -7,7 +7,7 @@ export const getReportTags = (req, res) => {
     res.json(tags);
   } catch (error) {
     console.error("Failed to fetch report tags:", error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -24,11 +24,12 @@ export const getReport = async (req, res) => {
 };
 
 export const createReport = async (req, res) => {
-  const { tag, description, latitude, longitude, user_id } = req.body;
+  const { tag, title, description, latitude, longitude, user_id } = req.body;
   try {
     const report = await prisma.reports.create({
       data: {
         tag,
+        title,
         description,
         latitude,
         longitude,
@@ -38,13 +39,13 @@ export const createReport = async (req, res) => {
     res.status(201).json(report);
   } catch (error) {
     console.error("Failed to create report:", error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: "Internal server error" });
   }
 }
 
 export const updateReport = async (req, res) => {
   const id = parseInt(req.params.id);
-  const { tag, description, latitude, longitude } = req.body;
+  const { tag, title, description, latitude, longitude } = req.body;
   try {
     const report = await prisma.reports.update({
       where: {
@@ -52,6 +53,7 @@ export const updateReport = async (req, res) => {
       },
       data: {
         tag,
+        title,
         description,
         latitude,
         longitude
@@ -60,7 +62,7 @@ export const updateReport = async (req, res) => {
     res.status(201).json(report);
   } catch (error) {
     console.error("Failed to create report:", error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: "Internal server error" });
   }
 }
 
@@ -74,7 +76,7 @@ export const getNearbyReports = async (req, res) => {
     return res.status(400).json({ error: "Latitude and longitude are required and must be numbers." });
   }
 
-  const radiusKm = 40;
+  const radiusKm = 10;
 
   try {
     // Haversine SQL
@@ -102,6 +104,6 @@ export const getNearbyReports = async (req, res) => {
     res.json(reports);
   } catch (error) {
     console.error("Failed to fetch nearby reports:", error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };

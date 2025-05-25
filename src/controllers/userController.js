@@ -8,7 +8,7 @@ export const getUser = async (req, res) => {
     res.json(user);
   } catch (error) {
     console.error("Failed to fetch users data:", error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -21,7 +21,7 @@ export const getUserById = async (req, res) => {
     res.json(user);
   } catch (error) {
     console.error("Failed to fetch user data:", error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -39,6 +39,6 @@ export const createUser = async (req, res) => {
     res.status(201).json(user);
   } catch (error) {
     console.error("Failed to create user:", error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };

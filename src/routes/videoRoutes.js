@@ -71,6 +71,8 @@ export default videoRoute;
  *                     type: string
  *                   video_url:
  *                     type: string
+*                   thumbnail_url:
+ *                     type: string
  *                   user_id:
  *                     type: string
  *                   created_at:
@@ -94,7 +96,7 @@ export default videoRoute;
  *         multipart/form-data:
  *           schema:
  *             type: object
- *             required: [video, tag, user_id]
+ *             required: [video, tag, title, user_id]
  *             properties:
  *               video:
  *                 type: string

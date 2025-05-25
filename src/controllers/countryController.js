@@ -22,7 +22,7 @@ export const getAllCountries = async (req, res) => {
     res.json(countries);
   } catch (error) {
     console.error("Failed to fetch countries:", error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -39,6 +39,6 @@ export const getCountriesWithLegals = async (req, res) => {
     res.json(countries);
   } catch (error) {
     console.error("Failed to fetch countries:", error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
