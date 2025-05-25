@@ -40,7 +40,7 @@ export const createReport = async (req, res) => {
         const components = result.address_components;
 
         const get = (type) =>
-          components.find((c) => c.types.includes(type))?.long_name;
+          components.find((c) => c.types.includes(type))?.short_name;
 
         longAddress = result.formatted_address;
         const district = get("sublocality") || get("sublocality_level_1");
