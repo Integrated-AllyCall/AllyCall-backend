@@ -146,3 +146,31 @@ export const getVideo = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const getVideoByUserId = async (req, res) => {
+  const { id } = req.params;
+  try {
+    if (!id) {
+      return res.status(400).json({ error: "User Id is required." });
+    }
+
+    const videos = await prisma.upload_videos.findMany({
+      where: {
+        user_id: id
+      },
+      include: {
+        users: {
+          select: {
+            username: true,
+          },
+        },
+      },
+      orderBy: { created_at: "desc" },
+    });
+
+    res.json(videos);
+  } catch (error) {
+    console.error("Failed to fetch video:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

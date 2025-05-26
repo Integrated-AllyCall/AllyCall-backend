@@ -7,6 +7,7 @@ const upload = multer({ dest: "uploads/" });
 const videoRoute = express.Router();
 
 videoRoute.get("/tags", videoController.getVideoTags);
+videoRoute.get("/user/:id", videoController.getVideoByUserId)
 videoRoute.get("/", videoController.getVideo);
 videoRoute.post("/", upload.single("video"), videoController.uploadVideo);
 videoRoute.put("/:id", videoController.updateVideoDetails);
@@ -30,6 +31,55 @@ export default videoRoute;
  *               type: array
  *               items:
  *                 type: string
+ */
+
+/**
+ * @swagger
+ * /videos/user/{id}:
+ *   get:
+ *     summary: Get videos uploaded by a specific user
+ *     tags: [Videos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the user
+ *       - in: query
+ *         name: num
+ *         required: false
+ *         schema:
+ *           type: integer
+ *         description: Limit the number of returned videos
+ *     responses:
+ *       200:
+ *         description: List of videos uploaded by the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   title:
+ *                     type: string
+ *                   url:
+ *                     type: string
+ *                   created_at:
+ *                     type: string
+ *                     format: date-time
+ *                   users:
+ *                     type: object
+ *                     properties:
+ *                       username:
+ *                         type: string
+ *       400:
+ *         description: Missing or invalid user ID
+ *       500:
+ *         description: Internal server error
  */
 
 /**
