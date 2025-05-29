@@ -60,6 +60,8 @@ export default reportRoute;
  *                     type: number
  *                   longitude:
  *                     type: number
+ *                   name:
+ *                     type: string
  *                   shortAddress:
  *                     type: string
  *                   longAddress:
@@ -109,6 +111,8 @@ export default reportRoute;
  *                     type: string
  *                   description:
  *                     type: string
+ *                   name:
+ *                     type: string
  *                   latitude:
  *                     type: number
  *                   longitude:
@@ -147,6 +151,8 @@ export default reportRoute;
  *               title:
  *                     type: string
  *               description:
+ *                 type: string
+ *               name:
  *                 type: string
  *               latitude:
  *                 type: number
@@ -191,6 +197,8 @@ export default reportRoute;
  *               title:
  *                 type: string
  *               description:
+ *                 type: string
+ *               name:
  *                 type: string
  *               latitude:
  *                 type: number
