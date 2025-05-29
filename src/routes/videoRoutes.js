@@ -9,7 +9,10 @@ const videoRoute = express.Router();
 videoRoute.get("/tags", videoController.getVideoTags);
 videoRoute.get("/user/:id", videoController.getVideoByUserId)
 videoRoute.get("/", videoController.getVideo);
-videoRoute.post("/", upload.single("video"), videoController.uploadVideo);
+videoRoute.post("/", upload.fields([
+      { name: 'video', maxCount: 1 },
+      { name: 'thumbnail', maxCount: 1 },
+]), videoController.uploadVideo);
 videoRoute.put("/:id", videoController.updateVideoDetails);
 // videoRoute.post("/", verifyFirebaseToken, upload.single("video"), videoController.uploadVideo);
 // videoRoute.put("/:id", verifyFirebaseToken, videoController.updateVideoDetails);
