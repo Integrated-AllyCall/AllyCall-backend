@@ -3,12 +3,17 @@ import { getCountryFromCoordinates } from "./countryController.js";
 
 export const getLegal = async (req, res) => {
   try {
-    const legals = await prisma.countries.findMany({
-      where: {
-        country_legals: {
-          some: {},
-        },
+    const { code } = req.query;
+
+    const whereClause = {
+      ...(code ? { code } : {}),
+      country_legals: {
+        some: {},
       },
+    };
+
+    const legals = await prisma.countries.findMany({
+      where: whereClause,
       include: {
         country_legals: {
           orderBy: { id: "desc" },
@@ -16,12 +21,14 @@ export const getLegal = async (req, res) => {
       },
       orderBy: { code: "asc" },
     });
+
     res.json(legals);
   } catch (error) {
     console.error("Failed to fetch legals:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 export const getLegalByCoordinates = async (req, res) => {
   try {

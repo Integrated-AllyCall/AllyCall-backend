@@ -22,14 +22,19 @@ export const getVideoTags = (req, res) => {
 
 export const uploadVideo = async (req, res) => {
   const { tag, title, description, user_id } = req.body;
-  const file = req.file;
-  if (!file) return res.status(400).json({ error: "No file uploaded." });
+  const videoFile = req.files?.video?.[0];
+  const thumbnailFile = req.files?.thumbnail?.[0];
 
-  const thumbnailPath = `${file.path}.jpg`;
+  if (!videoFile) return res.status(400).json({ error: "No video uploaded." });
+
+  const thumbnailPath = thumbnailFile
+    ? thumbnailFile.path
+    : `${videoFile.path}.jpg`;
 
   try {
+    // Get video duration
     const metadata = await new Promise((resolve, reject) => {
-      ffmpeg.ffprobe(file.path, (err, data) => {
+      ffmpeg.ffprobe(videoFile.path, (err, data) => {
         if (err) return reject(err);
         resolve(data);
       });
@@ -37,35 +42,41 @@ export const uploadVideo = async (req, res) => {
 
     const duration = metadata.format.duration;
     if (duration > 3600) {
-      fs.unlinkSync(file.path);
+      fs.unlinkSync(videoFile.path);
+      if (thumbnailFile) fs.unlinkSync(thumbnailFile.path);
       return res.status(400).json({ error: "Video duration must be under 1 hour." });
     }
 
-    await new Promise((resolve, reject) => {
-      ffmpeg(file.path)
-        .on('end', resolve)
-        .on('error', reject)
-        .screenshots({
-          count: 1,
-          folder: path.dirname(file.path),
-          filename: path.basename(thumbnailPath),
-          size: '320x568',
-        });
-    });
+    // Generate thumbnail if not provided by client
+    if (!thumbnailFile) {
+      await new Promise((resolve, reject) => {
+        ffmpeg(videoFile.path)
+          .on('end', resolve)
+          .on('error', reject)
+          .screenshots({
+            count: 1,
+            folder: path.dirname(thumbnailPath),
+            filename: path.basename(thumbnailPath),
+            size: '320x568',
+          });
+      });
+    }
 
-    // Upload to MinIO
-    const objectName = `${Date.now()}-${file.originalname}`;
-    await minioClient.fPutObject(VIDEO_BUCKET, objectName, file.path, {
-      "Content-Type": file.mimetype,
+    // Upload video to MinIO
+    const objectName = `${Date.now()}-${videoFile.originalname}`;
+    await minioClient.fPutObject(VIDEO_BUCKET, objectName, videoFile.path, {
+      "Content-Type": videoFile.mimetype,
     });
     const videoUrl = `http://10.4.56.28:9000/${VIDEO_BUCKET}/${objectName}`;
 
-    const thumbnailName = `${Date.now()}-${file.originalname}-thumb.jpg`;
+    // Upload thumbnail to MinIO
+    const thumbnailName = `${Date.now()}-${videoFile.originalname}-thumb.jpg`;
     await minioClient.fPutObject(THUMBNAIL_BUCKET, thumbnailName, thumbnailPath, {
       "Content-Type": "image/jpeg",
     });
     const thumbnailUrl = `http://10.4.56.28:9000/${THUMBNAIL_BUCKET}/${thumbnailName}`;
-    // Upload to Postgres
+
+    // Save to Postgres
     const video = await prisma.upload_videos.create({
       data: {
         tag,
@@ -77,18 +88,20 @@ export const uploadVideo = async (req, res) => {
         duration,
       },
     });
-    
-    fs.unlinkSync(thumbnailPath);
-    fs.unlinkSync(file.path);
+
+    // Cleanup
+    fs.unlinkSync(videoFile.path);
+    if (!thumbnailFile) fs.unlinkSync(thumbnailPath);
 
     res.status(201).json(video);
   } catch (error) {
     console.error("Failed to upload video:", error);
-    fs.unlinkSync(thumbnailPath);
-    fs.unlinkSync(file.path);
+    if (fs.existsSync(videoFile.path)) fs.unlinkSync(videoFile.path);
+    if (fs.existsSync(thumbnailPath)) fs.unlinkSync(thumbnailPath);
     res.status(500).json({ error: "Upload failed" });
   }
 };
+
 
 export const updateVideoDetails = async (req, res) => {
   const id = parseInt(req.params.id);
@@ -133,6 +146,7 @@ export const getVideo = async (req, res) => {
       include: {
         users: {
           select: {
+            id: true,
             username: true,
           },
         },
@@ -161,6 +175,7 @@ export const getVideoByUserId = async (req, res) => {
       include: {
         users: {
           select: {
+            id: true,
             username: true,
           },
         },
