@@ -146,6 +146,7 @@ export const getVideo = async (req, res) => {
       include: {
         users: {
           select: {
+            id: true,
             username: true,
           },
         },
@@ -174,6 +175,7 @@ export const getVideoByUserId = async (req, res) => {
       include: {
         users: {
           select: {
+            id: true,
             username: true,
           },
         },
