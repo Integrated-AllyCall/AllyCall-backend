@@ -24,7 +24,8 @@ export const uploadVideo = async (req, res) => {
   const { tag, title, description, user_id } = req.body;
   const file = req.file;
   if (!file) return res.status(400).json({ error: "No file uploaded." });
-
+console.log(req.body);
+console.log(req.file);
   const thumbnailPath = `${file.path}.jpg`;
 
   try {
