@@ -40,7 +40,9 @@ export const getCityFromCoords = async (lat, lng) => {
     comp.types.includes("locality")
   );
 
-  if (!locality && !sublocality) throw new Error("City not found");
+  // if (!locality && !sublocality) {
+  //   re
+  // };
 
   return [sublocality?.long_name, locality?.long_name]
     .filter(Boolean)
