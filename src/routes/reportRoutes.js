@@ -9,6 +9,8 @@ reportRoute.get("/", reportController.getReport);
 reportRoute.get("/nearby", reportController.getNearbyReports);
 reportRoute.post("/", reportController.createReport);
 reportRoute.put("/:id", reportController.updateReport);
+reportRoute.get("/user/:id", reportController.getReportByUserId);
+
 // reportRoute.post("/", verifyFirebaseToken, reportController.createReport);
 // reportRoute.put("/:id", verifyFirebaseToken, reportController.updateReport);
 
