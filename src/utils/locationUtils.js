@@ -8,21 +8,19 @@ export const isValidCoords = (lat, lng) => {
   return !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng));
 };
 
-export const fetchGeocodeComponents = async (lat, lng, apiKey) => {
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
-  const { data } = await axios.get(url);
-
-  if (!data.results || !data.results.length) {
-    throw new Error("No geocoding results found.");
-  }
-
-  return data.results.flatMap(result => result.address_components);
-};
-
 export const getCountryFromCoords = async (lat, lng) => {
-  const components = await fetchGeocodeComponents(lat, lng, apiKey);
-  const country = components.find(comp => comp.types.includes("country"));
-  if (!country) throw new Error("Country not found");
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
+  let { data } = await axios.get(url);
+  const components = data.results.flatMap(result => result.address_components);
+  let country = components.find(comp => comp.types.includes("country"));
+
+  if (!country) {
+    country = {
+      long_name: 'Thailand',
+      short_name: 'TH'
+    }
+  };
+
   return {
     long_name: country.long_name,
     short_name: country.short_name,
@@ -30,7 +28,9 @@ export const getCountryFromCoords = async (lat, lng) => {
 };
 
 export const getCityFromCoords = async (lat, lng) => {
-  const components = await fetchGeocodeComponents(lat, lng, apiKey);
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
+  const { data } = await axios.get(url);
+  const components = data.results.flatMap(result => result.address_components);
 
   const sublocality = components.find(comp =>
     comp.types.includes("sublocality") || comp.types.includes("neighborhood")

@@ -42,13 +42,6 @@ export const getLegalByCoordinates = async (req, res) => {
     }
 
     const country = await getCountryFromCoords(latitude, longitude);
-    if (!country) {
-      country = {
-        long_name: 'Thailand',
-        short_name: 'TH',
-      };
-    }  
-
     const legals = await prisma.country_legals.findMany({
       where: { country_code: country.short_name },
       orderBy: { id: "desc" } 
