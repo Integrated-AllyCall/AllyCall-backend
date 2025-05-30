@@ -109,7 +109,7 @@ export const getNearbyReports = async (req, res) => {
 
   const latitude = parseFloat(lat);
   const longitude = parseFloat(lng);
-
+  console.log(latitude, longitude);
   if (isNaN(latitude) || isNaN(longitude)) {
     return res.status(400).json({
       error: "Latitude and longitude are required and must be numbers.",
