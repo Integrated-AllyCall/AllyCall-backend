@@ -43,7 +43,10 @@ export const getLegalByCoordinates = async (req, res) => {
 
     const country = await getCountryFromCoords(latitude, longitude);
     if (!country) {
-      return res.status(404).json({ error: "Country not found for coordinates." });
+      country = {
+        long_name: 'Thailand',
+        short_name: 'TH',
+      };
     }  
 
     const legals = await prisma.country_legals.findMany({
