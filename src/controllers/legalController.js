@@ -1,5 +1,5 @@
 import prisma from "../configs/prisma.js";
-import { getCountryFromCoordinates } from "./countryController.js";
+import { getCountryFromCoords } from "../utils/locationUtils.js";
 
 export const getLegal = async (req, res) => {
   try {
@@ -29,7 +29,6 @@ export const getLegal = async (req, res) => {
   }
 };
 
-
 export const getLegalByCoordinates = async (req, res) => {
   try {
     const { lat, lng } = req.query;
@@ -42,7 +41,7 @@ export const getLegalByCoordinates = async (req, res) => {
       return res.status(400).json({ error: "Latitude and longitude must be valid numbers." });
     }
 
-    const country = await getCountryFromCoordinates(latitude, longitude);
+    const country = await getCountryFromCoords(latitude, longitude);
     if (!country) {
       return res.status(404).json({ error: "Country not found for coordinates." });
     }  

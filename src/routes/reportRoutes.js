@@ -76,7 +76,7 @@ export default reportRoute;
  * @swagger
  * /api/reports/nearby:
  *   get:
- *     summary: Get reports within 40 km of user's location
+ *     summary: Get reports within 10 km of user's location and return city
  *     tags: [Reports]
  *     parameters:
  *       - in: query
@@ -95,39 +95,45 @@ export default reportRoute;
  *           example: 100.5018
  *     responses:
  *       200:
- *         description: A list of nearby reports
+ *         description: Nearby reports and user location city
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                   tag:
- *                     type: string
- *                   title:
- *                     type: string
- *                   description:
- *                     type: string
- *                   name:
- *                     type: string
- *                   latitude:
- *                     type: number
- *                   longitude:
- *                     type: number
- *                   shortAddress:
- *                     type: string
- *                   longAddress:
- *                     type: string
- *                   user_id:
- *                     type: string
- *                   distance:
- *                     type: number
- *                     description: Distance from the user's location (in km)
+ *               type: object
+ *               properties:
+ *                 city:
+ *                   type: string
+ *                   example: "Lat Phrao, Bangkok"
+ *                 reports:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       tag:
+ *                         type: string
+ *                       title:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                       latitude:
+ *                         type: number
+ *                       longitude:
+ *                         type: number
+ *                       shortAddress:
+ *                         type: string
+ *                       longAddress:
+ *                         type: string
+ *                       user_id:
+ *                         type: string
+ *                       distance:
+ *                         type: number
+ *                         description: Distance from the user's location (in km)
  *       400:
- *         description: Latitude and longitude are required and must be numbers
+ *         description: Latitude and longitude are required and must be valid numbers
  *       500:
  *         description: Internal server error
  */
