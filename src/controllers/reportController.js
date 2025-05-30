@@ -152,3 +152,27 @@ export const getNearbyReports = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const getReportByUserId = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    if (!id) {
+      return res.status(400).json({ error: "User ID is required." });
+    }
+
+    const reports = await prisma.reports.findMany({
+      where: {
+        user_id: id,
+      },
+      orderBy: {
+        created_at: "desc",
+      },
+    });
+
+    res.json(reports);
+  } catch (error) {
+    console.error("Failed to fetch reports by user ID:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
