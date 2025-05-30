@@ -1,7 +1,7 @@
 import { video_tag } from "@prisma/client";
 import prisma from "../configs/prisma.js";
 import fs from "fs";
-import { minioClient, VIDEO_BUCKET,THUMBNAIL_BUCKET } from "../configs/minio.js";
+import { minioClient, VIDEO_BUCKET, THUMBNAIL_BUCKET } from "../configs/minio.js";
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import ffprobeInstaller from '@ffprobe-installer/ffprobe';
@@ -155,6 +155,37 @@ export const getVideo = async (req, res) => {
     });
 
     res.json(videos);
+  } catch (error) {
+    console.error("Failed to fetch video:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getVideoById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    if (!id) {
+      return res.status(400).json({ error: "Id is required." });
+    }
+    const video = await prisma.upload_videos.findUnique({
+      where: {
+        id: parseInt(id)
+      },
+      include: {
+        users: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+    });
+    if (!video) {
+      return res.status(404).json({ error: "Video not found." });
+    }
+
+    res.json(video);
   } catch (error) {
     console.error("Failed to fetch video:", error);
     res.status(500).json({ error: "Internal server error" });
