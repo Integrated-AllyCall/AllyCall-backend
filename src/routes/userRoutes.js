@@ -5,9 +5,79 @@ const userRoute = express.Router();
 
 userRoute.get("/", userController.getUser);
 userRoute.get("/:id", userController.getUserById);
+userRoute.get("/:id/image", userController.getUserImageById);
 userRoute.post("/", userController.createUser);
 
 export default userRoute;
+
+/**
+ * @swagger
+ * /api/users/{id}/image:
+ *   get:
+ *     summary: Get user profile image by user ID
+ *     description: Fetches and proxies the profile image of a user from their stored image URL.
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the user
+ *         schema:
+ *           type: string
+ *           example: clx9g1x6d0000s3b04y94jhd2
+ *     responses:
+ *       200:
+ *         description: The proxied image
+ *         content:
+ *           image/jpeg:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *           image/png:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       400:
+ *         description: Missing or invalid user ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: User ID is required.
+ *       404:
+ *         description: User or image not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: User or user image not found.
+ *       502:
+ *         description: Failed to fetch image from source
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Failed to fetch image. Status: 404"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Internal server error
+ */
 
 /**
  * @swagger

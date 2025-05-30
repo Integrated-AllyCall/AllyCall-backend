@@ -123,26 +123,26 @@ export const getNearbyReports = async (req, res) => {
   try {
     // Haversine SQL
     const reports = await prisma.$queryRawUnsafe(`
-      SELECT *, (
-        6371 * acos(
-          cos(radians(${latitude}))
-          * cos(radians(latitude))
-          * cos(radians(longitude) - radians(${longitude}))
-          + sin(radians(${latitude})) * sin(radians(latitude))
-        )
-      ) AS distance
-      FROM reports
-      WHERE (
-        6371 * acos(
-          cos(radians(${latitude}))
-          * cos(radians(latitude))
-          * cos(radians(longitude) - radians(${longitude}))
-          + sin(radians(${latitude})) * sin(radians(latitude))
-        )
-      ) < ${radiusKm}
-      ORDER BY distance ASC
-    `);
-
+    SELECT *, (
+      6371 * acos(
+        cos(radians($1))
+        * cos(radians(latitude))
+        * cos(radians(longitude) - radians($2))
+        + sin(radians($1)) * sin(radians(latitude))
+      )
+    ) AS distance
+    FROM reports
+    WHERE (
+      6371 * acos(
+        cos(radians($1))
+        * cos(radians(latitude))
+        * cos(radians(longitude) - radians($2))
+        + sin(radians($1)) * sin(radians(latitude))
+      )
+    ) < $3
+    ORDER BY distance ASC
+  `, latitude, longitude, radiusKm);
+  
     res.json({
       city: city ?? '',
       reports: reports

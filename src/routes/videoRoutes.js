@@ -7,7 +7,8 @@ const upload = multer({ dest: "uploads/" });
 const videoRoute = express.Router();
 
 videoRoute.get("/tags", videoController.getVideoTags);
-videoRoute.get("/user/:id", videoController.getVideoByUserId)
+videoRoute.get("/:id", videoController.getVideoById);
+videoRoute.get("/user/:id", videoController.getVideoByUserId);
 videoRoute.get("/", videoController.getVideo);
 videoRoute.post("/", upload.fields([
       { name: 'video', maxCount: 1 },
@@ -18,6 +19,51 @@ videoRoute.put("/:id", videoController.updateVideoDetails);
 // videoRoute.put("/:id", verifyFirebaseToken, videoController.updateVideoDetails);
 
 export default videoRoute;
+
+/**
+ * @swagger
+ * /api/videos/{id}:
+ *   get:
+ *     summary: Get video by ID
+ *     tags: [Videos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The video ID
+ *     responses:
+ *       200:
+ *         description: The video data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 title:
+ *                   type: string
+ *                 description:
+ *                   type: string
+ *                 created_at:
+ *                   type: string
+ *                   format: date-time
+ *                 users:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     username:
+ *                       type: string
+ *       400:
+ *         description: Missing video ID
+ *       404:
+ *         description: Video not found
+ *       500:
+ *         description: Internal server error
+ */
 
 /**
  * @swagger
@@ -38,7 +84,7 @@ export default videoRoute;
 
 /**
  * @swagger
- * /videos/user/{id}:
+ * /api/videos/user/{id}:
  *   get:
  *     summary: Get videos uploaded by a specific user
  *     tags: [Videos]
