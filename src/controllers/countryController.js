@@ -1,18 +1,18 @@
 import axios from "axios";
 import prisma from "../configs/prisma.js";
 
-export const getCountryFromCoordinates = async (lat, lng) => {
-  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  export const getCountryFromCoordinates = async (lat, lng) => {
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
-  const { data } = await axios.get(url);
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
+    const { data } = await axios.get(url);
 
-  const countryComponent = data.results
-    ?.flatMap((r) => r.address_components)
-    .find((comp) => comp.types.includes("country"));
+    const countryComponent = data.results
+      ?.flatMap((r) => r.address_components)
+      .find((comp) => comp.types.includes("country"));
 
-  return countryComponent || null;
-};
+    return countryComponent || null;
+  };
 
 export const getAllCountries = async (req, res) => {
   try {
