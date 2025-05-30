@@ -82,6 +82,8 @@ export default userRoute;
  *                 type: string
  *               email:
  *                 type: string
+ *               image_url:
+ *                 type: string
  *     responses:
  *       201:
  *         description: User created successfully

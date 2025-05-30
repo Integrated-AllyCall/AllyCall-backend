@@ -1,6 +1,7 @@
 import prisma from "../configs/prisma.js";
 import { report_tag } from "@prisma/client";
 import dotenv from "dotenv";
+import { getCityFromCoords } from "../utils/locationUtils.js";
 dotenv.config();
 
 export const getReportTags = (req, res) => {
@@ -108,12 +109,14 @@ export const getNearbyReports = async (req, res) => {
 
   const latitude = parseFloat(lat);
   const longitude = parseFloat(lng);
-
+  console.log(latitude, longitude);
   if (isNaN(latitude) || isNaN(longitude)) {
     return res.status(400).json({
       error: "Latitude and longitude are required and must be numbers.",
     });
   }
+
+  const city = await getCityFromCoords(latitude, longitude);
 
   const radiusKm = 10;
 
@@ -140,7 +143,10 @@ export const getNearbyReports = async (req, res) => {
       ORDER BY distance ASC
     `);
 
-    res.json(reports);
+    res.json({
+      city: city ?? '',
+      reports: reports
+  });
   } catch (error) {
     console.error("Failed to fetch nearby reports:", error);
     res.status(500).json({ error: "Internal server error" });
