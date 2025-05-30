@@ -19,6 +19,52 @@ export default reportRoute;
 
 /**
  * @swagger
+ * /reports/user/{id}:
+ *   get:
+ *     summary: Get reports submitted by a specific user
+ *     description: Retrieves a list of reports created by the user with the given ID.
+ *     tags:
+ *       - Reports
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the user whose reports are being requested.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: A list of reports submitted by the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Report'
+ *       400:
+ *         description: Bad Request – User ID is missing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: User ID is required.
+ *       500:
+ *         description: Internal Server Error – Could not fetch reports
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Internal server error
+ */
+
+/**
+ * @swagger
  * /api/reports/tags:
  *   get:
  *     summary: Get available report tags
