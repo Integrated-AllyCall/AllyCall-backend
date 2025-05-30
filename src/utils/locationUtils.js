@@ -1,4 +1,8 @@
 import axios from "axios";
+import dotenv from 'dotenv';
+dotenv.config();
+
+const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
 export const isValidCoords = (lat, lng) => {
   return !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng));
@@ -15,7 +19,7 @@ export const fetchGeocodeComponents = async (lat, lng, apiKey) => {
   return data.results.flatMap(result => result.address_components);
 };
 
-export const getCountryFromCoords = async (lat, lng, apiKey) => {
+export const getCountryFromCoords = async (lat, lng) => {
   const components = await fetchGeocodeComponents(lat, lng, apiKey);
   const country = components.find(comp => comp.types.includes("country"));
   if (!country) throw new Error("Country not found");
@@ -25,7 +29,7 @@ export const getCountryFromCoords = async (lat, lng, apiKey) => {
   };
 };
 
-export const getCityFromCoords = async (lat, lng, apiKey) => {
+export const getCityFromCoords = async (lat, lng) => {
   const components = await fetchGeocodeComponents(lat, lng, apiKey);
 
   const sublocality = components.find(comp =>
