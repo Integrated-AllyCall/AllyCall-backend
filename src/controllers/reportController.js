@@ -6,7 +6,7 @@ dotenv.config();
 
 export const getReportTags = (req, res) => {
   try {
-    const tags = Object.values(report_tag);
+    const tags = Object.values(report_tag).map(tag => tag.replace(/_/g, ' '));
     res.json(tags);
   } catch (error) {
     console.error("Failed to fetch report tags:", error);
@@ -14,22 +14,15 @@ export const getReportTags = (req, res) => {
   }
 };
 
-export const getReport = async (req, res) => {
-  try {
-    const reports = await prisma.reports.findMany({
-      orderBy: { id: "desc" },
-    });
-    res.json(reports);
-  } catch (error) {
-    console.error("Failed to fetch reports:", error);
-    res.status(500).json({ error: "Failed to fetch reports" });
-  }
-};
-
 export const createReport = async (req, res) => {
   const { tag, title, description, latitude, longitude, user_id } = req.body;
   let { shortAddress, longAddress, name } = req.body;
   try {
+    let tagEnum;
+    if (tag) {
+      tagEnum = tag.replace(/ /g, '_');
+    }
+
     if (!longAddress && !shortAddress && !name) {
       const geoRes = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${process.env.GOOGLE_MAPS_API_KEY}`
@@ -63,7 +56,7 @@ export const createReport = async (req, res) => {
 
     const report = await prisma.reports.create({
       data: {
-        tag,
+        tag: tagEnum,
         title,
         description,
         name,
@@ -84,17 +77,57 @@ export const createReport = async (req, res) => {
 export const updateReport = async (req, res) => {
   const id = parseInt(req.params.id);
   const { tag, title, description, latitude, longitude } = req.body;
+  let { shortAddress, longAddress, name } = req.body;
   try {
+    let tagEnum;
+    if (tag) {
+      tagEnum = tag.replace(/ /g, '_');
+    }
+
+    if (!longAddress && !shortAddress && !name) {
+      const geoRes = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${process.env.GOOGLE_MAPS_API_KEY}`
+      );
+      const geoData = await geoRes.json();
+
+      if (geoData.status === "OK" && geoData.results.length > 0) {
+        const result = geoData.results[0];
+        const components = result.address_components;
+
+        const get = (type) =>
+          components.find((c) => c.types.includes(type))?.short_name;
+
+        longAddress = result.formatted_address;
+        const district = get("sublocality") || get("sublocality_level_1");
+        const city =
+          get("locality") ||
+          get("administrative_area_level_2") ||
+          get("administrative_area_level_1");
+        const country = get("country");
+
+        shortAddress = [district, city, country].filter(Boolean).join(", ");
+
+        const streetNumber = get("street_number");
+        const route = get("route");
+        name =
+          get("premise") ||
+          (streetNumber && route ? `${streetNumber} ${route}` : null);
+      }
+    }
+
     const report = await prisma.reports.update({
       where: {
         id,
       },
       data: {
-        tag,
+        tag: tagEnum,
         title,
         description,
         latitude,
         longitude,
+        name,
+        short_address: shortAddress,
+        long_address: longAddress,
       },
     });
     res.status(201).json(report);
@@ -104,12 +137,29 @@ export const updateReport = async (req, res) => {
   }
 };
 
+export const getReport = async (req, res) => {
+  try {
+    let reports = await prisma.reports.findMany({
+      orderBy: { id: "desc" },
+    });
+
+    reports = reports.map((report) => ({
+      ...report,
+      tag: report.tag.replace(/_/g, ' '),
+    }));
+
+    res.json(reports);
+  } catch (error) {
+    console.error("Failed to fetch reports:", error);
+    res.status(500).json({ error: "Failed to fetch reports" });
+  }
+};
+
 export const getNearbyReports = async (req, res) => {
   const { lat, lng } = req.query;
-
   const latitude = parseFloat(lat);
   const longitude = parseFloat(lng);
-  console.log(latitude, longitude);
+
   if (isNaN(latitude) || isNaN(longitude)) {
     return res.status(400).json({
       error: "Latitude and longitude are required and must be numbers.",
@@ -117,41 +167,57 @@ export const getNearbyReports = async (req, res) => {
   }
 
   const city = await getCityFromCoords(latitude, longitude);
-
   const radiusKm = 10;
 
   try {
-    // Haversine SQL
-    const reports = await prisma.$queryRawUnsafe(`
-    SELECT *, (
-      6371 * acos(
-        cos(radians($1))
-        * cos(radians(latitude))
-        * cos(radians(longitude) - radians($2))
-        + sin(radians($1)) * sin(radians(latitude))
-      )
-    ) AS distance
-    FROM reports
-    WHERE (
-      6371 * acos(
-        cos(radians($1))
-        * cos(radians(latitude))
-        * cos(radians(longitude) - radians($2))
-        + sin(radians($1)) * sin(radians(latitude))
-      )
-    ) < $3
-    ORDER BY distance ASC
-  `, latitude, longitude, radiusKm);
-  
+    let reports = await prisma.$queryRawUnsafe(`
+      SELECT 
+        r.*, 
+        u.id as user_id,
+        u.name as user_name,
+        u.email as user_email,
+        (
+          6371 * acos(
+            cos(radians($1))
+            * cos(radians(r.latitude))
+            * cos(radians(r.longitude) - radians($2))
+            + sin(radians($1)) * sin(radians(r.latitude))
+          )
+        ) AS distance
+      FROM reports r
+      JOIN users u ON r.user_id = u.id
+      WHERE (
+        6371 * acos(
+          cos(radians($1))
+          * cos(radians(r.latitude))
+          * cos(radians(r.longitude) - radians($2))
+          + sin(radians($1)) * sin(radians(r.latitude))
+        )
+      ) < $3
+      ORDER BY distance ASC
+    `, latitude, longitude, radiusKm);
+
+    // Format tag and attach nested user object
+    reports = reports.map((report) => ({
+      ...report,
+      tag: report.tag.replace(/_/g, ' '),
+      users: {
+        id: report.user_id,
+        username: report.user_name,
+      },
+    }));
+
     res.json({
       city: city ?? '',
-      reports: reports
-  });
+      reports,
+    });
   } catch (error) {
     console.error("Failed to fetch nearby reports:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
 
 export const getReportByUserId = async (req, res) => {
   const { id } = req.params;
@@ -161,14 +227,22 @@ export const getReportByUserId = async (req, res) => {
       return res.status(400).json({ error: "User ID is required." });
     }
 
-    const reports = await prisma.reports.findMany({
-      where: {
-        user_id: id,
+    let reports = await prisma.reports.findMany({
+      where: { user_id: id },
+      include: {
+        users: {
+          select: {
+            id: true,
+          },
+        },
       },
-      orderBy: {
-        created_at: "desc",
-      },
+      orderBy: { created_at: "desc" },
     });
+
+    reports = reports.map((report) => ({
+      ...report,
+      tag: report.tag.replace(/_/g, ' '),
+    }));
 
     res.json(reports);
   } catch (error) {
@@ -176,3 +250,4 @@ export const getReportByUserId = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+

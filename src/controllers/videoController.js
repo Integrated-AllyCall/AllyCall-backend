@@ -12,7 +12,7 @@ ffmpeg.setFfprobePath(ffprobeInstaller.path);
 
 export const getVideoTags = (req, res) => {
   try {
-    const tags = Object.values(video_tag);
+    const tags = Object.values(video_tag).map(tag => tag.replace(/_/g, ' '));
     res.json(tags);
   } catch (error) {
     console.error("Failed to fetch video tags:", error);
@@ -32,6 +32,11 @@ export const uploadVideo = async (req, res) => {
     : `${videoFile.path}.jpg`;
 
   try {
+    let tagEnum;
+    if (tag) {
+      tagEnum = tag.replace(/ /g, '_');
+    }
+    
     // Get video duration
     const metadata = await new Promise((resolve, reject) => {
       ffmpeg.ffprobe(videoFile.path, (err, data) => {
@@ -79,7 +84,7 @@ export const uploadVideo = async (req, res) => {
     // Save to Postgres
     const video = await prisma.upload_videos.create({
       data: {
-        tag,
+        tag: tagEnum,
         title,
         description,
         video_url: videoUrl,
@@ -107,12 +112,17 @@ export const updateVideoDetails = async (req, res) => {
   const id = parseInt(req.params.id);
   const { tag, title, description } = req.body;
   try {
+    let tagEnum;
+    if (tag) {
+      tagEnum = tag.replace(/ /g, '_');
+    }
+    
     const video = await prisma.upload_videos.update({
       where: {
         id: id,
       },
       data: {
-        tag,
+        tag: tagEnum,
         title,
         description,
       },
