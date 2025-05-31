@@ -67,7 +67,11 @@ export const createReport = async (req, res) => {
         user_id,
       },
     });
-    res.status(201).json(report);
+    res.status(201).json({
+      ...report,
+      tag: report.tag.replace(/_/g, ' '),
+    });
+
   } catch (error) {
     console.error("Failed to create report:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -130,7 +134,11 @@ export const updateReport = async (req, res) => {
         long_address: longAddress,
       },
     });
-    res.status(201).json(report);
+    res.status(201).json({
+      ...report,
+      tag: report.tag.replace(/_/g, ' '),
+    });
+
   } catch (error) {
     console.error("Failed to create report:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -142,13 +150,10 @@ export const getReport = async (req, res) => {
     let reports = await prisma.reports.findMany({
       orderBy: { id: "desc" },
     });
-
-    reports = reports.map((report) => ({
+    res.json(reports.map((report) => ({
       ...report,
       tag: report.tag.replace(/_/g, ' '),
-    }));
-
-    res.json(reports);
+    })));
   } catch (error) {
     console.error("Failed to fetch reports:", error);
     res.status(500).json({ error: "Failed to fetch reports" });
@@ -226,7 +231,7 @@ export const getReportByUserId = async (req, res) => {
       return res.status(400).json({ error: "User ID is required." });
     }
 
-    let reports = await prisma.reports.findMany({
+    const reports = await prisma.reports.findMany({
       where: { user_id: id },
       include: {
         users: {
@@ -238,12 +243,10 @@ export const getReportByUserId = async (req, res) => {
       orderBy: { created_at: "desc" },
     });
 
-    reports = reports.map((report) => ({
+    res.json(reports.map((report) => ({
       ...report,
       tag: report.tag.replace(/_/g, ' '),
-    }));
-
-    res.json(reports);
+    })));
   } catch (error) {
     console.error("Failed to fetch reports by user ID:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -278,7 +281,11 @@ export const getReportById = async (req, res) => {
       return res.status(404).json({ error: "Report not found." });
     }
 
-    res.json(report);
+    res.json({
+      ...report,
+      tag: report.tag.replace(/_/g, ' '),
+    });
+
   } catch (error) {
     console.error("Failed to fetch report:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -308,7 +315,10 @@ export const deleteReportById = async (req, res) => {
 
     return res.status(200).json({
       message: "Report deleted successfully.",
-      deletedVideo: report,
+      deletedVideo: {
+        ...report,
+        tag: report.tag.replace(/_/g, ' '),
+      },
     });
   } catch (error) {
     console.error(`Error deleting report with ID ${id}:`, error);

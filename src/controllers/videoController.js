@@ -36,7 +36,7 @@ export const uploadVideo = async (req, res) => {
     if (tag) {
       tagEnum = tag.replace(/ /g, '_');
     }
-    
+
     // Get video duration
     const metadata = await new Promise((resolve, reject) => {
       ffmpeg.ffprobe(videoFile.path, (err, data) => {
@@ -98,7 +98,10 @@ export const uploadVideo = async (req, res) => {
     fs.unlinkSync(videoFile.path);
     if (!thumbnailFile) fs.unlinkSync(thumbnailPath);
 
-    res.status(201).json(video);
+    res.status(201).json({
+      ...video,
+      tag: video.tag.replace(/_/g, ' '),
+    });
   } catch (error) {
     console.error("Failed to upload video:", error);
     if (fs.existsSync(videoFile.path)) fs.unlinkSync(videoFile.path);
@@ -116,7 +119,7 @@ export const updateVideoDetails = async (req, res) => {
     if (tag) {
       tagEnum = tag.replace(/ /g, '_');
     }
-    
+
     const video = await prisma.upload_videos.update({
       where: {
         id: id,
@@ -127,7 +130,10 @@ export const updateVideoDetails = async (req, res) => {
         description,
       },
     });
-    res.status(201).json(video);
+    res.status(201).json({
+      ...video,
+      tag: video.tag.replace(/_/g, ' '),
+    });
   } catch (error) {
     console.error("Failed to update details:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -138,9 +144,10 @@ export const getVideo = async (req, res) => {
   const { tag, search, num } = req.query;
   try {
     const where = {};
-
+    let tagEnum;
     if (tag) {
-      where.tag = tag;
+      tagEnum = tag.replace(/ /g, '_');
+      where.tag = tagEnum;
     }
     if (search) {
       const words = search.split(" ").filter(Boolean);
@@ -164,7 +171,12 @@ export const getVideo = async (req, res) => {
       orderBy: { created_at: "desc" },
     });
 
-    res.json(videos);
+    res.json(
+      videos.map((video) => ({
+        ...video,
+        tag: video.tag.replace(/_/g, ' '),
+      }))
+    );
   } catch (error) {
     console.error("Failed to fetch video:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -199,7 +211,10 @@ export const getVideoById = async (req, res) => {
       return res.status(404).json({ error: "Video not found." });
     }
 
-    res.json(video);
+    res.json({
+      ...video,
+      tag: video.tag.replace(/_/g, ' '),
+    });
   } catch (error) {
     console.error("Failed to fetch video:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -227,8 +242,10 @@ export const getVideoByUserId = async (req, res) => {
       },
       orderBy: { created_at: "desc" },
     });
-
-    res.json(videos);
+    res.json(videos.map((video) => ({
+      ...video,
+      tag: video.tag.replace(/_/g, ' '),
+    })));
   } catch (error) {
     console.error("Failed to fetch video:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -258,7 +275,10 @@ export const deleteVideoById = async (req, res) => {
 
     return res.status(200).json({
       message: "Video deleted successfully.",
-      deletedVideo: video,
+      deletedVideo: {
+        ...video,
+        tag: video.tag.replace(/_/g, ' '),
+      },
     });
   } catch (error) {
     console.error(`Error deleting video with ID ${id}:`, error);
