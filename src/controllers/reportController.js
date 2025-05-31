@@ -174,8 +174,7 @@ export const getNearbyReports = async (req, res) => {
       SELECT 
         r.*, 
         u.id as user_id,
-        u.name as user_name,
-        u.email as user_email,
+        u.username as username,
         (
           6371 * acos(
             cos(radians($1))
@@ -203,7 +202,7 @@ export const getNearbyReports = async (req, res) => {
       tag: report.tag.replace(/_/g, ' '),
       users: {
         id: report.user_id,
-        username: report.user_name,
+        username: report.username,
       },
     }));
 
