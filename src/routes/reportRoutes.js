@@ -8,13 +8,93 @@ reportRoute.get("/tags", reportController.getReportTags);
 reportRoute.get("/", reportController.getReport);
 reportRoute.get("/nearby", reportController.getNearbyReports);
 reportRoute.post("/", reportController.createReport);
+reportRoute.get("/:id", reportController.getReportById);
 reportRoute.put("/:id", reportController.updateReport);
+reportRoute.delete("/:id", reportController.deleteReportById);
 reportRoute.get("/user/:id", reportController.getReportByUserId);
 
 // reportRoute.post("/", verifyFirebaseToken, reportController.createReport);
 // reportRoute.put("/:id", verifyFirebaseToken, reportController.updateReport);
 
 export default reportRoute;
+
+/**
+ * @swagger
+ * /api/reports/{id}:
+ *   get:
+ *     summary: Get a report by ID
+ *     tags: [Reports]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Numeric ID of the report to retrieve
+ *     responses:
+ *       200:
+ *         description: Report found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 reason:
+ *                   type: string
+ *                 users:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     username:
+ *                       type: string
+ *       400:
+ *         description: Invalid or missing report ID
+ *       404:
+ *         description: Report not found
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /api/reports/{id}:
+ *   delete:
+ *     summary: Delete a report by ID
+ *     tags: [Reports]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Numeric ID of the report to delete
+ *     responses:
+ *       200:
+ *         description: Report deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 deletedReport:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     reason:
+ *                       type: string
+ *       400:
+ *         description: Invalid report ID
+ *       404:
+ *         description: Report not found
+ *       500:
+ *         description: Internal server error
+ */
 
 
 /**

@@ -250,3 +250,68 @@ export const getReportByUserId = async (req, res) => {
   }
 };
 
+export const getReportById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    if (!id) {
+      return res.status(400).json({ error: "Id is required." });
+    }
+    const reportId = parseInt(id, 10);
+    if (isNaN(reportId)) {
+      return res.status(400).json({ error: "Invalid report ID." });
+    }
+    const report = await prisma.reports.findUnique({
+      where: {
+        id: reportId
+      },
+      include: {
+        users: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+    });
+    if (!report) {
+      return res.status(404).json({ error: "Report not found." });
+    }
+
+    res.json(report);
+  } catch (error) {
+    console.error("Failed to fetch report:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const deleteReportById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const reportId = parseInt(id, 10);
+    if (isNaN(reportId)) {
+      return res.status(400).json({ error: "Invalid report ID." });
+    }
+
+    const report = await prisma.reports.findUnique({
+      where: { id: reportId },
+    });
+
+    if (!report) {
+      return res.status(404).json({ error: "Report not found." });
+    }
+
+    await prisma.reports.delete({
+      where: { id: reportId },
+    });
+
+    return res.status(200).json({
+      message: "Report deleted successfully.",
+      deletedVideo: report,
+    });
+  } catch (error) {
+    console.error(`Error deleting report with ID ${id}:`, error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+};
