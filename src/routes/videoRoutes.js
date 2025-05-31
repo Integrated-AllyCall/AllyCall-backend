@@ -8,6 +8,7 @@ const videoRoute = express.Router();
 
 videoRoute.get("/tags", videoController.getVideoTags);
 videoRoute.get("/:id", videoController.getVideoById);
+videoRoute.delete("/:id", videoController.deleteVideoById);
 videoRoute.get("/user/:id", videoController.getVideoByUserId);
 videoRoute.get("/", videoController.getVideo);
 videoRoute.post("/", upload.fields([
@@ -20,45 +21,83 @@ videoRoute.put("/:id", videoController.updateVideoDetails);
 
 export default videoRoute;
 
+
 /**
  * @swagger
  * /api/videos/{id}:
  *   get:
- *     summary: Get video by ID
+ *     summary: Get video details by ID
  *     tags: [Videos]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
- *           type: string
- *         description: The video ID
+ *           type: integer
+ *         description: Numeric ID of the video to retrieve
  *     responses:
  *       200:
- *         description: The video data
+ *         description: Video found
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
  *                 id:
- *                   type: string
+ *                   type: integer
  *                 title:
  *                   type: string
  *                 description:
  *                   type: string
- *                 created_at:
- *                   type: string
- *                   format: date-time
  *                 users:
  *                   type: object
  *                   properties:
  *                     id:
- *                       type: string
+ *                       type: integer
  *                     username:
  *                       type: string
  *       400:
- *         description: Missing video ID
+ *         description: Invalid or missing video ID
+ *       404:
+ *         description: Video not found
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /api/videos/{id}:
+ *   delete:
+ *     summary: Delete a video by ID
+ *     tags: [Videos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Numeric ID of the video to delete
+ *     responses:
+ *       200:
+ *         description: Video deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 deletedVideo:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     title:
+ *                       type: string
+ *                     description:
+ *                       type: string
+ *       400:
+ *         description: Invalid video ID
  *       404:
  *         description: Video not found
  *       500:

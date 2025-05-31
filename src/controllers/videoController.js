@@ -178,9 +178,13 @@ export const getVideoById = async (req, res) => {
     if (!id) {
       return res.status(400).json({ error: "Id is required." });
     }
+    const videoId = parseInt(id, 10);
+    if (isNaN(videoId)) {
+      return res.status(400).json({ error: "Invalid video ID." });
+    }
     const video = await prisma.upload_videos.findUnique({
       where: {
-        id: parseInt(id)
+        id: videoId
       },
       include: {
         users: {
@@ -228,5 +232,36 @@ export const getVideoByUserId = async (req, res) => {
   } catch (error) {
     console.error("Failed to fetch video:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const deleteVideoById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const videoId = parseInt(id, 10);
+    if (isNaN(videoId)) {
+      return res.status(400).json({ error: "Invalid video ID." });
+    }
+
+    const video = await prisma.upload_videos.findUnique({
+      where: { id: videoId },
+    });
+
+    if (!video) {
+      return res.status(404).json({ error: "Video not found." });
+    }
+
+    await prisma.upload_videos.delete({
+      where: { id: videoId },
+    });
+
+    return res.status(200).json({
+      message: "Video deleted successfully.",
+      deletedVideo: video,
+    });
+  } catch (error) {
+    console.error(`Error deleting video with ID ${id}:`, error);
+    return res.status(500).json({ error: "Internal server error." });
   }
 };
